@@ -18,4 +18,13 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // プロフィールページは「1ファイル=1人」で、ページ(default)と一覧用のメタデータ
+    // (profile)を同じファイルに置く設計。Fast Refresh 最適化のためのルールなので、
+    // このディレクトリでは無効化する。
+    files: ['src/profiles/*.jsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
 ])
