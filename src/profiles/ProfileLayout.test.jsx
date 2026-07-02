@@ -1,5 +1,5 @@
-import { describe, it, expect, afterEach } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
 import ProfileLayout from './ProfileLayout'
 
 // テスト用のサンプルデータ(1人分のプロフィール)
@@ -14,9 +14,6 @@ const sampleProfile = {
   skills: ['React', 'Vitest'],
   links: [{ label: 'GitHub', href: 'https://github.com/' }],
 }
-
-// テストごとに画面をリセットする
-afterEach(cleanup)
 
 describe('ProfileLayout(プロフィールページの共通レイアウト)', () => {
   it('名前が見出しとして表示される', () => {
