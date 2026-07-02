@@ -9,7 +9,9 @@ export const profiles = Object.values(modules)
     ...mod.profile,
     Page: mod.default,
   }))
-  .sort((a, b) => a.name.localeCompare(b.name, 'ja'))
+  // name が未入力のファイルがあってもアプリ全体が落ちないようにしておく
+  // (未入力そのものは自動テストが検知してエラーメッセージを出す)
+  .sort((a, b) => String(a.name ?? '').localeCompare(String(b.name ?? ''), 'ja'))
 
 export function getProfile(id) {
   return profiles.find((profile) => profile.id === id)
