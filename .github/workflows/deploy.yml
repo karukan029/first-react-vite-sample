@@ -1,0 +1,78 @@
+# 継続的デリバリー (CD) の定義ファイル。
+# main ブランチに変更が取り込まれるたびに、アプリを自動でビルドして
+# GitHub Pages (Web サイト) に公開する。
+name: Deploy
+
+# ── いつ実行するか ──────────────────────────────
+# main ブランチにコードが push されたとき (= Pull Request がマージされたとき)
+on:
+  push:
+    branches: [main]
+
+# GitHub Pages へ公開するために必要な権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 同時に複数のデプロイが走らないようにする
+# (短時間に連続でマージされても、デプロイは1件ずつ順番に行う)
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+# ── 何を実行するか ──────────────────────────────
+# デプロイメントパイプライン: 検証・ビルド → 公開 の順に流れる
+jobs:
+  # ── ジョブ1: 検証してビルドする ──
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. リポジトリのコードを実行マシンに取得する
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # 2. Node.js (JavaScript の実行環境) を準備する
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3. アプリが利用している外部パッケージをインストールする
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. 公開する直前にも自動テストを実行する。
+      #    壊れたアプリはここでパイプラインが止まり、公開されない (品質ゲート)
+      - name: Test
+        run: npm test
+
+      # 5. 公開できる形 (HTML/CSS/JS) にアプリを組み立てる
+      - name: Build
+        run: npm run build
+
+      # 6. GitHub Pages の公開設定を準備する
+      - name: Setup Pages
+        uses: actions/configure-pages@v6
+
+      # 7. ビルド成果物 (dist フォルダ) を次のジョブに受け渡す
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  # ── ジョブ2: 公開する ──
+  deploy:
+    # needs: build → ジョブ1が成功したときだけ実行される
+    needs: build
+    runs-on: ubuntu-latest
+    # デプロイ先の環境。実行後、Actions の画面に公開 URL が表示される
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # ジョブ1で受け渡されたビルド成果物を GitHub Pages に配置する
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
