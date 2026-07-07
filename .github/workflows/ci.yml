@@ -1,0 +1,45 @@
+# 継続的インテグレーション (CI) の定義ファイル。
+# このファイルがリポジトリにあるだけで、GitHub が下記の処理を自動実行してくれる。
+name: CI
+
+# ── いつ実行するか ──────────────────────────────
+# ・main ブランチにコードが push されたとき
+# ・Pull Request が作成・更新されたとき
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# ── 何を実行するか ──────────────────────────────
+jobs:
+  # PR のチェック欄には「CI / lint-test-build」という名前で表示される
+  lint-test-build:
+    # GitHub が用意した Linux マシン上で実行される
+    runs-on: ubuntu-latest
+    steps:
+      # 1. リポジトリのコードを実行マシンに取得する
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # 2. Node.js (JavaScript の実行環境) を準備する
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      # 3. アプリが利用している外部パッケージをインストールする
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. 静的チェック: コードの書き方にルール違反がないか調べる
+      - name: Lint
+        run: npm run lint
+
+      # 5. 自動テスト: アプリが正しく動くかを検証する
+      - name: Test
+        run: npm test
+
+      # 6. ビルド: 公開できる形にアプリを組み立てられるか確認する
+      - name: Build
+        run: npm run build
