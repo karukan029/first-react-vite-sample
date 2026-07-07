@@ -5,8 +5,8 @@ export const profile = {
   id: 'ryoto-yokokawa',
   name: '横川 凌大',
   role: 'UI / UX デザイナー',
-  emoji: '🌷',
-  location: '大阪',
+  emoji: '⚽',
+  location: '東京',
   tagline: 'デザインで課題を解決する',
   bio: [
     'プロダクトの体験設計からビジュアルデザインまで幅広く担当しています。',
