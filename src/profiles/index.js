@@ -1,7 +1,9 @@
 // src/profile/ 配下の各ファイル(1ファイル=1人)をまとめて読み込む。
 // 新しいプロフィールファイルを追加すれば、自動的に一覧へ反映される。
 // ※ ProfileLayout.jsx のような `profile` を export しないファイルは除外する。
-const modules = import.meta.glob('./*.jsx', { eager: true })
+// ※ テストファイル(*.test.jsx)を読み込むと vitest がブラウザ用バンドルに
+//    混入してアプリが起動しなくなるため、`!` パターンで除外する。
+const modules = import.meta.glob(['./*.jsx', '!./*.test.jsx'], { eager: true })
 
 export const profiles = Object.values(modules)
   .filter((mod) => mod.profile && mod.default)
